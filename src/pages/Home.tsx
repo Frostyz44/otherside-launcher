@@ -73,6 +73,7 @@ function fmtLocalTime(d: Date): string {
   return `${h12}${m ? ':' + String(m).padStart(2, '0') : ''}${ampm}`;
 }
 
+
 function EventChip({ event, onOpen }: { event: CalendarEvent; onOpen: (url: string) => void }) {
   const d = new Date(event.dateTime);
   const imgSrc = event.imageUrl ?? null;
@@ -152,6 +153,7 @@ function ParticleBackground() {
 export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement | null> }) {
   const [experiences, setExperiences] = useState<ExperienceData[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const nextEvent = events[0] ?? null;
   const [idx, setIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(0);
   const [trailerOpen, setTrailerOpen] = useState(false);
@@ -296,6 +298,7 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
           : heroImage ? <img src={heroImage} alt={exp?.name ?? ''} key={`i-${idx}`} className="hero-video-bg hero-bg-next" /> : null}
         <div className="hero-overlay" />
 
+
         {/* Bottom-left: title + buttons */}
         <div className="hero-left">
           {exp ? (
@@ -341,7 +344,7 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
               </div>
             ) : (
               <div className="hero-events-track">
-                {events.map((e, i) => (
+                {events.slice(1).map((e, i) => (
                   <EventChip key={i} event={e} onOpen={openLink} />
                 ))}
               </div>
@@ -349,22 +352,36 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
           </div>
         </div>
 
-        {/* Bottom-right: patch note cards */}
-        <div className="hero-patches">
-          <div className="hero-patches-head">
-            <span className="hero-patches-label">Patch Notes</span>
-            <span className="hero-patches-more" onClick={() => openLink(PATCH_URL)}>See all ↗</span>
-          </div>
-          <div className="hero-patches-cards">
-            {PATCHES.map(p => (
-              <div key={p.id} className="patch-card" onClick={() => openLink(PATCH_URL)}>
-                <div className="patch-card-ver">{p.version}</div>
-                <ul className="patch-card-list">
-                  {p.bullets.slice(0, 3).map((b, i) => <li key={i}>{b}</li>)}
-                </ul>
+        {/* Bottom-right: next event + patch notes cards */}
+        <div className="hero-info-panel">
+          {nextEvent && (
+            <div className="next-event-wrap">
+              <span className="info-card-label">Next Event</span>
+              <div
+                className="next-event-card"
+                onClick={() => nextEvent.externalUrl && openLink(nextEvent.externalUrl)}
+                style={{ cursor: nextEvent.externalUrl ? 'pointer' : 'default' }}
+              >
+                {nextEvent.imageUrl && <img className="next-event-bg" src={nextEvent.imageUrl} alt="" />}
+                <div className="next-event-overlay" />
+                <div className="next-event-content">
+                  <span className="next-event-name">{nextEvent.title}</span>
+                  <span className="next-event-time">{fmtRelative(new Date(nextEvent.dateTime))}</span>
+                </div>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
+          {PATCHES[0] && (
+            <div className="hero-patches-group">
+              <span className="info-card-label">Patch Notes</span>
+              <div className="patch-card" onClick={() => openLink(PATCH_URL)}>
+                  <ul className="patch-card-list">
+                    {PATCHES[0].bullets.slice(0, 3).map((b, i) => <li key={i}>{b}</li>)}
+                  </ul>
+                  <div className="patch-card-ver">{PATCHES[0].version}</div>
+                </div>
+            </div>
+          )}
         </div>
 
         {featured.length > 1 && (
