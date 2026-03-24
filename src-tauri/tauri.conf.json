@@ -1,6 +1,6 @@
 {
   "productName": "OSWiki",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "identifier": "xyz.oswiki.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -34,6 +34,7 @@
   },
   "bundle": {
     "active": true,
+    "createUpdaterArtifacts": true,
     "targets": "all",
     "icon": [
       "icons/32x32.png",
