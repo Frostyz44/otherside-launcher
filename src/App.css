@@ -503,15 +503,34 @@ body {
 .hero-tab:hover { background: rgba(240,230,211,0.5); }
 .hero-tab.active { background: var(--accent); width: 20px; border-radius: 3px; }
 
-.hero-mute-btn {
+.hero-video-progress {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+  height: 2px; background: rgba(255,255,255,0.06); pointer-events: none;
+}
+.hero-video-progress-bar {
+  height: 100%; background: rgba(200,155,60,0.55);
+  transition: width 0.25s linear;
+  box-shadow: 0 0 4px rgba(200,155,60,0.3);
+}
+.hero-volume-ctrl {
   position: absolute; top: 14px; right: 14px; z-index: 4;
-  width: 30px; height: 30px; border-radius: 4px;
+  display: flex; flex-direction: row-reverse; align-items: center; gap: 6px;
+}
+.hero-mute-btn {
+  width: 30px; height: 30px; border-radius: 4px; flex-shrink: 0;
   border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.45);
   backdrop-filter: blur(6px); color: rgba(240,230,211,0.7);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 .hero-mute-btn:hover { background: rgba(0,0,0,0.65); color: var(--text); border-color: rgba(255,255,255,0.3); }
+.hero-volume-slider {
+  width: 70px; height: 3px; cursor: pointer; accent-color: var(--accent);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+.hero-volume-slider.visible { opacity: 0.85; pointer-events: auto; }
+.hero-volume-slider.visible:hover { opacity: 1; }
 
 /* ── Overlaid events — bottom strip ── */
 .hero-events {
@@ -731,7 +750,7 @@ body {
   width: 36px; height: 20px; border-radius: 10px; border: none;
   background: var(--surface3); cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0;
 }
-.toggle-on { background: var(--accent2); }
+.toggle-on { background: var(--accent); }
 .toggle-thumb {
   position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
   border-radius: 50%; background: #fff; transition: transform 0.2s;

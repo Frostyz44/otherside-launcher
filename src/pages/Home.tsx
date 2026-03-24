@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type RefObject } from 'react';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { fetchExperiences } from '../api';
 import type { ExperienceData } from '../types';
@@ -127,12 +127,16 @@ function ParticleBackground() {
   return <canvas ref={canvasRef} className="particle-canvas" />;
 }
 
-export default function Home() {
+export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement | null> }) {
   const [experiences, setExperiences] = useState<ExperienceData[]>([]);
   const [idx, setIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(0);
   const [trailerOpen, setTrailerOpen] = useState(false);
   const [muted, setMuted] = useState(true);
+  const [volume, setVolume] = useState(0.3);
+  const [sliderVisible, setSliderVisible] = useState(false);
+  const sliderHideRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [videoProgress, setVideoProgress] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -250,7 +254,15 @@ export default function Home() {
           ? <video src={prevHeroVideo} className="hero-video-bg hero-bg-prev" autoPlay loop muted playsInline preload="metadata" />
           : prevHeroImage ? <img src={prevHeroImage} alt="" className="hero-video-bg hero-bg-prev" /> : null}
         {heroVideo
-          ? <video ref={videoRef} key={`v-${idx}`} src={heroVideo} className="hero-video-bg hero-bg-next" autoPlay loop muted={muted} playsInline preload="metadata" />
+          ? <video
+              ref={el => { (videoRef as React.MutableRefObject<HTMLVideoElement | null>).current = el; if (el) el.volume = volume; }}
+              key={`v-${idx}`} src={heroVideo} className="hero-video-bg hero-bg-next"
+              autoPlay loop muted={muted} playsInline preload="metadata"
+              onTimeUpdate={e => {
+                const v = e.currentTarget;
+                if (v.duration) setVideoProgress(v.currentTime / v.duration);
+              }}
+            />
           : heroImage ? <img src={heroImage} alt={exp?.name ?? ''} key={`i-${idx}`} className="hero-video-bg hero-bg-next" /> : null}
         <div className="hero-overlay" />
 
@@ -328,12 +340,50 @@ export default function Home() {
         )}
 
         {heroVideo && (
-          <button className="hero-mute-btn" onClick={() => setMuted(m => !m)} title={muted ? 'Unmute' : 'Mute'}>
-            {muted
-              ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-              : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-            }
-          </button>
+          <div className="hero-video-progress">
+            <div className="hero-video-progress-bar" style={{ width: `${videoProgress * 100}%` }} />
+          </div>
+        )}
+
+        {heroVideo && (
+          <div
+            className="hero-volume-ctrl"
+            onMouseEnter={() => {
+              if (sliderHideRef.current) clearTimeout(sliderHideRef.current);
+              setSliderVisible(true);
+            }}
+            onMouseLeave={() => {
+              sliderHideRef.current = setTimeout(() => setSliderVisible(false), 2500);
+            }}
+          >
+            <button className="hero-mute-btn" onClick={() => {
+              const nowMuted = !muted;
+              setMuted(nowMuted);
+              if (bgMusic?.current) {
+                if (nowMuted) bgMusic.current.play().catch(() => {});
+                else bgMusic.current.pause();
+              }
+            }} title={muted ? 'Unmute' : 'Mute'}>
+              {muted
+                ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              }
+            </button>
+            {!muted && (
+              <input
+                className={`hero-volume-slider${sliderVisible ? ' visible' : ''}`}
+                type="range" min={0} max={1} step={0.05}
+                value={volume}
+                onChange={e => {
+                  const v = parseFloat(e.target.value);
+                  setVolume(v);
+                  if (videoRef.current) videoRef.current.volume = v;
+                  if (sliderHideRef.current) clearTimeout(sliderHideRef.current);
+                  sliderHideRef.current = setTimeout(() => setSliderVisible(false), 2500);
+                }}
+              />
+            )}
+          </div>
         )}
       </div>
     </div>

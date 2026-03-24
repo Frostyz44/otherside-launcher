@@ -51,4 +51,5 @@ export interface Settings {
   minimizeToTray: boolean;
   launchAtStartup: boolean;
   notifications: boolean;
+  bgMusic: boolean;
 }

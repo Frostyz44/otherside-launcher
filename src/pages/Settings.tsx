@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type RefObject } from 'react';
 import type { Settings } from '../types';
 
 const SETTINGS_KEY = 'oswiki_settings';
@@ -9,10 +9,11 @@ export function loadSettings(): Settings {
       minimizeToTray: true,
       launchAtStartup: false,
       notifications: true,
+      bgMusic: true,
       ...JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}'),
     };
   } catch {
-    return { minimizeToTray: true, launchAtStartup: false, notifications: true };
+    return { minimizeToTray: true, launchAtStartup: false, notifications: true, bgMusic: true };
   }
 }
 
@@ -23,6 +24,7 @@ export function saveSettings(s: Settings) {
 interface Props {
   settings: Settings;
   onChange: (s: Settings) => void;
+  bgMusic?: RefObject<HTMLAudioElement | null>;
 }
 
 function Toggle({ label, description, checked, onChange }: {
@@ -49,7 +51,7 @@ function Toggle({ label, description, checked, onChange }: {
   );
 }
 
-export default function Settings({ settings, onChange }: Props) {
+export default function Settings({ settings, onChange, bgMusic }: Props) {
   const [updateStatus, setUpdateStatus] = useState<'idle' | 'checking' | 'latest' | 'available'>('idle');
 
   async function checkForUpdates() {
@@ -106,6 +108,19 @@ export default function Settings({ settings, onChange }: Props) {
               description="Receive notifications when experiences go live or have updates"
               checked={settings.notifications}
               onChange={v => update('notifications', v)}
+            />
+            <div className="setting-divider" />
+            <Toggle
+              label="Background music"
+              description="Play ambient music while the launcher is open"
+              checked={settings.bgMusic}
+              onChange={v => {
+                update('bgMusic', v);
+                if (bgMusic?.current) {
+                  if (v) bgMusic.current.play().catch(() => {});
+                  else bgMusic.current.pause();
+                }
+              }}
             />
           </div>
         </section>

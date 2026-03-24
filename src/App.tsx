@@ -109,6 +109,31 @@ export default function App() {
   const [visited, setVisited] = useState<Set<NavPage>>(new Set(['home']));
   const [updateInfo, setUpdateInfo] = useState<{ version: string; install: () => Promise<void> } | null>(null);
   const [updating, setUpdating] = useState(false);
+  const bgMusicRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const saved = loadSettings();
+    if (!saved.bgMusic) return;
+    const audio = new Audio('/sounds/background-sound.mp3');
+    audio.loop = true;
+    audio.volume = 0.05;
+    bgMusicRef.current = audio;
+    const play = () => { audio.play().catch(() => {}); };
+    window.addEventListener('click', play, { once: true });
+    let unlistenFocus: (() => void) | null = null;
+    import('@tauri-apps/api/window').then(({ getCurrentWindow }) => {
+      getCurrentWindow().onFocusChanged(({ payload: focused }) => {
+        if (!bgMusicRef.current) return;
+        if (focused) bgMusicRef.current.play().catch(() => {});
+        else bgMusicRef.current.pause();
+      }).then(fn => { unlistenFocus = fn; });
+    }).catch(() => {});
+    return () => {
+      window.removeEventListener('click', play);
+      unlistenFocus?.();
+      audio.pause();
+    };
+  }, []);
 
   useEffect(() => {
     preloadSounds();
@@ -262,10 +287,10 @@ export default function App() {
         <div className="content-area">
           {(['home', 'experiences', 'shop', 'settings'] as const).map(id => (
             <div key={id} className={`page-mount${page === id ? ' page-mount-active' : ''}`}>
-              {visited.has(id) && id === 'home' && <Home />}
+              {visited.has(id) && id === 'home' && <Home bgMusic={bgMusicRef} />}
               {visited.has(id) && id === 'experiences' && <Experiences />}
               {visited.has(id) && id === 'shop' && <div className="page-soon">Shop coming soon</div>}
-              {visited.has(id) && id === 'settings' && <SettingsPage settings={settings} onChange={handleSettingsChange} />}
+              {visited.has(id) && id === 'settings' && <SettingsPage settings={settings} onChange={handleSettingsChange} bgMusic={bgMusicRef} />}
             </div>
           ))}
         </div>
