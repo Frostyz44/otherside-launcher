@@ -1,8 +1,14 @@
 import { useState, useEffect, useRef, type RefObject } from 'react';
 import { openUrl } from '@tauri-apps/plugin-opener';
+import { invoke } from '@tauri-apps/api/core';
+import { Tooltip } from '../components/Tooltip';
 import { fetchExperiences } from '../api';
 import type { ExperienceData } from '../types';
 import { sfxLaunch, sfxSlide, sfxClick } from '../sounds';
+
+const TZ_SHORT = Intl.DateTimeFormat('en', { timeZoneName: 'short' })
+  .formatToParts(new Date())
+  .find(p => p.type === 'timeZoneName')?.value ?? 'Local';
 const CDN = 'https://cdn.oswiki.xyz/videos';
 
 const SLUG_VIDEOS: Record<string, string> = {
@@ -35,23 +41,29 @@ const PATCHES = [
   },
 ];
 
-const EVENTS = [
-  { id: 1, name: 'Mutant MockTail',        date: new Date('2026-03-24T02:00:00Z'), recurrence: 'Weekly' },
-  { id: 2, name: 'The Render Pool',         date: new Date('2026-03-24T20:00:00Z'), recurrence: 'Weekly' },
-  { id: 3, name: 'Chimpers Game Day',       date: new Date('2026-03-24T20:00:00Z'), recurrence: 'Bi-weekly' },
-  { id: 4, name: 'CHAOS TRIALS',            date: new Date('2026-03-25T02:00:00Z'), recurrence: 'Weekly' },
-  { id: 5, name: 'Game Time with Jay B',    date: new Date('2026-03-25T18:00:00Z'), recurrence: 'Weekly' },
-  { id: 6, name: 'FLINGERS: Game Night',    date: new Date('2026-03-25T20:00:00Z'), recurrence: 'Weekly' },
-  { id: 7, name: 'Meet At The Club House',  date: new Date('2026-03-27T00:00:00Z'), recurrence: 'Weekly' },
-];
-
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-function fmtDate(d: Date) {
-  return `${MONTHS[d.getMonth()]} ${d.getDate()}`;
+interface CalendarEvent {
+  id: string;
+  title: string;
+  dateTime: string;
+  recurrenceType: string;
+  externalUrl: string | null;
 }
 
-function fmtTime(d: Date) {
+function fmtRelative(d: Date): string {
+  const diffMs = d.getTime() - Date.now();
+  const diffMin = Math.round(diffMs / 60_000);
+  if (diffMin < 0) return 'now';
+  if (diffMin < 60) return `in ${diffMin}m`;
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24) return `in ${diffH}h`;
+  const diffD = Math.floor(diffH / 24);
+  if (diffD === 1) return 'tomorrow';
+  if (diffD < 7) return `in ${diffD} days`;
+  const diffW = Math.floor(diffD / 7);
+  return diffW === 1 ? 'in 1 week' : `in ${diffW} weeks`;
+}
+
+function fmtLocalTime(d: Date): string {
   const h = d.getHours();
   const m = d.getMinutes();
   const ampm = h >= 12 ? 'pm' : 'am';
@@ -59,13 +71,19 @@ function fmtTime(d: Date) {
   return `${h12}${m ? ':' + String(m).padStart(2, '0') : ''}${ampm}`;
 }
 
-function EventChip({ event }: { event: typeof EVENTS[0] }) {
+function EventChip({ event, onOpen }: { event: CalendarEvent; onOpen: (url: string) => void }) {
+  const d = new Date(event.dateTime);
   return (
-    <div className="ev-chip">
-      <span className="ev-date">{fmtDate(event.date)}</span>
-      <span className="ev-time">{fmtTime(event.date)}</span>
-      <span className="ev-name">{event.name}</span>
-    </div>
+    <Tooltip label={`${d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })} · ${fmtLocalTime(d)} ${TZ_SHORT}`} side="top">
+      <div
+        className="ev-chip"
+        onClick={() => event.externalUrl && onOpen(event.externalUrl)}
+        style={{ cursor: event.externalUrl ? 'pointer' : 'default' }}
+      >
+        <span className="ev-relative">{fmtRelative(d)}</span>
+        <span className="ev-name">{event.title}</span>
+      </div>
+    </Tooltip>
   );
 }
 
@@ -129,6 +147,7 @@ function ParticleBackground() {
 
 export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement | null> }) {
   const [experiences, setExperiences] = useState<ExperienceData[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [idx, setIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(0);
   const [trailerOpen, setTrailerOpen] = useState(false);
@@ -144,6 +163,13 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
     fetchExperiences({ sortBy: 'sort_order', sortDirection: 'asc' })
       .then(res => setExperiences(res.data))
       .catch(() => {});
+    const loadEvents = () =>
+      invoke<CalendarEvent[]>('fetch_upcoming_events')
+        .then(data => setEvents(data))
+        .catch(err => console.error('fetch_upcoming_events:', err));
+    loadEvents();
+    const timer = setInterval(loadEvents, 5 * 60 * 1000);
+    return () => clearInterval(timer);
   }, []);
 
   // Build featured list: defined slugs first (in order), then all remaining active experiences
@@ -305,11 +331,17 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
             <span className="hero-events-label-text">Upcoming</span>
           </div>
           <div className="hero-events-ticker">
-            <div className="hero-events-track">
-              {[...EVENTS, ...EVENTS].map((e, i) => (
-                <EventChip key={i} event={e} />
-              ))}
-            </div>
+            {events.length === 0 ? (
+              <div className="ev-chip" style={{ opacity: 0.35 }}>
+                <span className="ev-name">Loading events…</span>
+              </div>
+            ) : (
+              <div className="hero-events-track">
+                {events.map((e, i) => (
+                  <EventChip key={i} event={e} onOpen={openLink} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -356,6 +388,7 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
               sliderHideRef.current = setTimeout(() => setSliderVisible(false), 2500);
             }}
           >
+            <Tooltip label={muted ? 'Unmute' : 'Mute'} side="top">
             <button className="hero-mute-btn" onClick={() => {
               const nowMuted = !muted;
               setMuted(nowMuted);
@@ -363,12 +396,13 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
                 if (nowMuted) bgMusic.current.play().catch(() => {});
                 else bgMusic.current.pause();
               }
-            }} title={muted ? 'Unmute' : 'Mute'}>
+            }}>
               {muted
                 ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
                 : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
               }
             </button>
+            </Tooltip>
             {!muted && (
               <input
                 className={`hero-volume-slider${sliderVisible ? ' visible' : ''}`}

@@ -4,9 +4,25 @@ use tauri::{
     Manager, Runtime,
 };
 
+#[tauri::command]
+async fn fetch_upcoming_events() -> Result<serde_json::Value, String> {
+    reqwest::Client::builder()
+        .use_rustls_tls()
+        .build()
+        .map_err(|e| e.to_string())?
+        .get("https://othersidecalendar.apechain.com/api/v1/events/upcoming?limit=10")
+        .send()
+        .await
+        .map_err(|e| e.to_string())?
+        .json::<serde_json::Value>()
+        .await
+        .map_err(|e| e.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![fetch_upcoming_events])
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_updater::Builder::new().build())

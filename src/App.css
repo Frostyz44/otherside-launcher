@@ -563,32 +563,41 @@ body {
   50% { opacity: 1; transform: scale(1.3); }
 }
 .hero-events-ticker {
-  flex: 1; overflow: hidden; display: flex; align-items: center;
+  flex: 1; overflow-x: auto; overflow-y: hidden;
+  display: flex; align-items: center;
+  scrollbar-width: none;
 }
+.hero-events-ticker::-webkit-scrollbar { display: none; }
 .hero-events-track {
   display: flex; align-items: center; gap: 0;
-  animation: ticker-scroll 40s linear infinite;
   white-space: nowrap;
 }
-.hero-events-track:hover { animation-play-state: paused; }
-@keyframes ticker-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+.tooltip-wrap {
+  position: relative; display: inline-flex;
 }
+.tooltip-box {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  background: #0a0a0a; border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(240,230,211,0.9); font-size: 11px; font-family: 'Barlow', sans-serif;
+  white-space: nowrap; padding: 4px 10px; border-radius: 6px;
+  pointer-events: none; z-index: 100;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  animation: tooltip-in 0.1s ease;
+}
+.tooltip-top { bottom: calc(100% + 6px); }
+.tooltip-bottom { top: calc(100% + 6px); }
+@keyframes tooltip-in { from { opacity: 0; } to { opacity: 1; } }
+
 .ev-chip {
   display: flex; align-items: center; gap: 10px;
   padding: 0 28px; flex-shrink: 0;
   border-right: 1px solid rgba(255,255,255,0.06);
 }
 .ev-sep { display: none; }
-.ev-date {
+.ev-relative {
   font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
   color: var(--accent); font-family: 'Barlow', monospace;
-  flex-shrink: 0; opacity: 0.9;
-}
-.ev-time {
-  font-size: 10px; font-weight: 500; color: rgba(240,230,211,0.35);
-  font-family: 'Barlow', monospace; flex-shrink: 0;
+  flex-shrink: 0; opacity: 0.9; white-space: nowrap;
 }
 .ev-name {
   font-size: 12px; font-weight: 600; color: rgba(240,230,211,0.85);

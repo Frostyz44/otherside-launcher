@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bell, ChevronRight, MessageSquare, Mic, Minus, Settings2, Users, X } from 'lucide-react';
+import { Tooltip } from './components/Tooltip';
 import oswikiLogo from './assets/oswiki_logo.png';
 import Home from './pages/Home';
 import Experiences from './pages/Experiences';
@@ -75,9 +76,11 @@ function NotifBell() {
 
   return (
     <div className="notif-wrap" ref={ref} data-tauri-drag-region={false}>
-      <button className="notif-btn" onClick={() => { sfxClick(); setOpen(o => !o); }} title="Notifications">
+      <Tooltip label="Notifications" side="bottom">
+      <button className="notif-btn" onClick={() => { sfxClick(); setOpen(o => !o); }}>
         <Bell size={18} strokeWidth={1.75} />
       </button>
+      </Tooltip>
       {unread > 0 && <span className="notif-dot">{unread}</span>}
       {open && (
         <div className="notif-panel">
@@ -267,15 +270,21 @@ export default function App() {
               <span className="tp-level">Level 40</span>
             </div>
             <div className="wc-buttons">
-              <button className="wc-btn" title="Minimize" onClick={() => invoke('plugin:window|minimize', { label: 'main' })}>
-                <Minus size={13} strokeWidth={2} />
-              </button>
-              <button className={`wc-btn wc-settings${page === 'settings' ? ' wc-settings-active' : ''}`} title="Settings" onClick={handleSettingsToggle}>
-                <Settings2 size={14} strokeWidth={1.75} />
-              </button>
-              <button className="wc-btn wc-close" title="Close" onClick={handleClose}>
-                <X size={14} strokeWidth={2} />
-              </button>
+              <Tooltip label="Minimize" side="bottom">
+                <button className="wc-btn" onClick={() => invoke('plugin:window|minimize', { label: 'main' })}>
+                  <Minus size={13} strokeWidth={2} />
+                </button>
+              </Tooltip>
+              <Tooltip label="Settings" side="bottom">
+                <button className={`wc-btn wc-settings${page === 'settings' ? ' wc-settings-active' : ''}`} onClick={handleSettingsToggle}>
+                  <Settings2 size={14} strokeWidth={1.75} />
+                </button>
+              </Tooltip>
+              <Tooltip label="Close to tray" side="bottom">
+                <button className="wc-btn wc-close" onClick={handleClose}>
+                  <X size={14} strokeWidth={2} />
+                </button>
+              </Tooltip>
             </div>
           </div>
         </div>
@@ -346,9 +355,9 @@ export default function App() {
           <div className="social-actions">
             <div className="social-actions-left">
               <NotifBell />
-              <button className="social-action-btn" title="Chat"><MessageSquare size={15} strokeWidth={1.75} /></button>
-              <button className="social-action-btn" title="Voice"><Mic size={15} strokeWidth={1.75} /></button>
-              <button className="social-action-btn" title="Party"><Users size={15} strokeWidth={1.75} /></button>
+              <Tooltip label="Chat" side="top"><button className="social-action-btn"><MessageSquare size={15} strokeWidth={1.75} /></button></Tooltip>
+              <Tooltip label="Voice" side="top"><button className="social-action-btn"><Mic size={15} strokeWidth={1.75} /></button></Tooltip>
+              <Tooltip label="Party" side="top"><button className="social-action-btn"><Users size={15} strokeWidth={1.75} /></button></Tooltip>
             </div>
           </div>
           <span className="social-version">v{__APP_VERSION__}</span>
