@@ -36,10 +36,10 @@ function play(buf: AudioBuffer, volume = 1.0, duration?: number, offset = 0) {
 
 // Preload all sounds on first import
 const SOUNDS = {
-  click:     '/sounds/click.wav',
-  launch:    '/sounds/launch.wav',
-  slide:     '/sounds/slide.wav',
-  hoverPlay: '/sounds/hover-play.wav',
+  click:     '/sounds/click.mp3',
+  launch:    '/sounds/launch.mp3',
+  slide:     '/sounds/slide.mp3',
+  hoverPlay: '/sounds/hover-play.mp3',
 };
 
 export function preloadSounds() {
