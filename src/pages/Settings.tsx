@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import type { Settings } from '../types';
+
+declare const __APP_VERSION__: string;
 
 const SETTINGS_KEY = 'oswiki_settings';
 
@@ -49,6 +52,27 @@ function Toggle({ label, description, checked, onChange }: {
 }
 
 export default function Settings({ settings, onChange }: Props) {
+  const [updateStatus, setUpdateStatus] = useState<'idle' | 'checking' | 'latest' | 'available'>('idle');
+
+  async function checkForUpdates() {
+    setUpdateStatus('checking');
+    try {
+      const { check } = await import('@tauri-apps/plugin-updater');
+      const update = await check();
+      if (update?.available) {
+        setUpdateStatus('available');
+        const { relaunch } = await import('@tauri-apps/plugin-process');
+        await update.downloadAndInstall();
+        await relaunch();
+      } else {
+        setUpdateStatus('latest');
+        setTimeout(() => setUpdateStatus('idle'), 3000);
+      }
+    } catch {
+      setUpdateStatus('idle');
+    }
+  }
+
   function update(key: keyof Settings, val: boolean) {
     const next = { ...settings, [key]: val };
     onChange(next);
@@ -93,7 +117,17 @@ export default function Settings({ settings, onChange }: Props) {
           <div className="settings-card settings-about">
             <div className="about-row">
               <span className="setting-label">OSWiki Launcher</span>
-              <span className="setting-desc">v0.1.0</span>
+              <span className="setting-desc">v{__APP_VERSION__}</span>
+            </div>
+            <div className="setting-divider" />
+            <div className="about-row">
+              <span className="setting-label">Updates</span>
+              <button className="about-update-btn" onClick={checkForUpdates} disabled={updateStatus === 'checking' || updateStatus === 'available'}>
+                {updateStatus === 'checking' && 'Checking…'}
+                {updateStatus === 'latest' && '✓ Up to date'}
+                {updateStatus === 'available' && 'Installing…'}
+                {updateStatus === 'idle' && 'Check for updates'}
+              </button>
             </div>
             <div className="setting-divider" />
             <div className="about-row">

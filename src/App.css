@@ -713,6 +713,14 @@ body {
 .about-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; }
 .about-link { color: var(--accent); font-size: 12px; text-decoration: none; }
 .about-link:hover { text-decoration: underline; }
+.about-update-btn {
+  background: none; border: 1px solid rgba(200,155,60,0.3); border-radius: 4px;
+  color: var(--accent); font-size: 11px; font-weight: 700;
+  font-family: 'Rajdhani', sans-serif; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 3px 10px; cursor: pointer; transition: background 0.2s, border-color 0.2s;
+}
+.about-update-btn:hover:not(:disabled) { background: rgba(200,155,60,0.1); border-color: var(--accent); }
+.about-update-btn:disabled { opacity: 0.5; cursor: default; }
 .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; gap: 16px; }
 .setting-divider { height: 1px; background: var(--border); }
 .setting-text { display: flex; flex-direction: column; gap: 3px; }
