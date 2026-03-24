@@ -38,7 +38,7 @@ export interface TrendingCollection {
   sales24h: number;
 }
 
-export type NavPage = 'home' | 'experiences' | 'market' | 'shop' | 'settings';
+export type NavPage = 'home' | 'experiences' | 'shop' | 'settings';
 
 export interface LastPlayed {
   slug: string;

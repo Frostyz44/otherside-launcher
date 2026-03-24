@@ -246,9 +246,10 @@ body {
 }
 .social-actions-left { display: flex; align-items: center; gap: 5px; }
 .social-version {
-  font-size: 10px; color: var(--text-muted); opacity: 0.3;
-  font-family: var(--font-mono, monospace); letter-spacing: 0.05em;
-  white-space: nowrap; flex-shrink: 0;
+  position: absolute; bottom: 6px; right: 10px;
+  font-size: 11px; color: rgba(255,255,255,0.3);
+  font-family: var(--font-mono, monospace); letter-spacing: 0.08em;
+  white-space: nowrap; pointer-events: none;
 }
 .social-action-btn {
   display: flex; align-items: center; justify-content: center;

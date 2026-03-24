@@ -3,7 +3,6 @@ import { Bell, ChevronRight, MessageSquare, Mic, Minus, Settings2, Users, X } fr
 import oswikiLogo from './assets/oswiki_logo.png';
 import Home from './pages/Home';
 import Experiences from './pages/Experiences';
-import Market from './pages/Market';
 import SettingsPage, { loadSettings, saveSettings } from './pages/Settings';
 import type { NavPage, Settings } from './types';
 import { sfxClick, sfxNavigate, sfxHover, sfxHoverPlay, sfxLaunch, preloadSounds } from './sounds';
@@ -261,11 +260,10 @@ export default function App() {
       <div className="main-area">
         {/* Content */}
         <div className="content-area">
-          {(['home', 'experiences', 'market', 'shop', 'settings'] as const).map(id => (
+          {(['home', 'experiences', 'shop', 'settings'] as const).map(id => (
             <div key={id} className={`page-mount${page === id ? ' page-mount-active' : ''}`}>
               {visited.has(id) && id === 'home' && <Home />}
               {visited.has(id) && id === 'experiences' && <Experiences />}
-              {visited.has(id) && id === 'market' && <Market />}
               {visited.has(id) && id === 'shop' && <div className="page-soon">Shop coming soon</div>}
               {visited.has(id) && id === 'settings' && <SettingsPage settings={settings} onChange={handleSettingsChange} />}
             </div>
@@ -327,8 +325,8 @@ export default function App() {
               <button className="social-action-btn" title="Voice"><Mic size={15} strokeWidth={1.75} /></button>
               <button className="social-action-btn" title="Party"><Users size={15} strokeWidth={1.75} /></button>
             </div>
-            <span className="social-version">v{__APP_VERSION__}</span>
           </div>
+          <span className="social-version">v{__APP_VERSION__}</span>
 
         </aside>
       </div>
