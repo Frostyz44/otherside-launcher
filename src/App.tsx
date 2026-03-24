@@ -108,18 +108,23 @@ export default function App() {
   const [page, setPage] = useState<NavPage>('home');
   const [settings, setSettings] = useState<Settings>(loadSettings());
   const [visited, setVisited] = useState<Set<NavPage>>(new Set(['home']));
+  const [updateInfo, setUpdateInfo] = useState<{ version: string; install: () => Promise<void> } | null>(null);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     preloadSounds();
-    // Check for updates silently on startup
     import('@tauri-apps/plugin-updater').then(({ check }) =>
       check().then(async update => {
         if (!update?.available) return;
-        const ok = window.confirm(`Update ${update.version} available. Install now?`);
-        if (!ok) return;
-        await update.downloadAndInstall();
-        const { relaunch } = await import('@tauri-apps/plugin-process');
-        await relaunch();
+        setUpdateInfo({
+          version: update.version,
+          install: async () => {
+            setUpdating(true);
+            await update.downloadAndInstall();
+            const { relaunch } = await import('@tauri-apps/plugin-process');
+            await relaunch();
+          },
+        });
       }).catch(() => {})
     ).catch(() => {});
   }, []);
@@ -174,6 +179,16 @@ export default function App() {
 
   return (
     <div className="app">
+      {updateInfo && (
+        <div className="update-toast">
+          <span className="update-toast-label">OSWiki Launcher <strong>v{updateInfo.version}</strong> is available</span>
+          <button className="update-toast-btn" disabled={updating} onClick={updateInfo.install}>
+            {updating ? 'Installing…' : 'Update now'}
+          </button>
+          <div style={{flex:1}} />
+          <button className="update-toast-dismiss" onClick={() => setUpdateInfo(null)}>✕</button>
+        </div>
+      )}
       {/* ── Top bar ── */}
       <header className="topbar" data-tauri-drag-region>
         <div className="topbar-left">
