@@ -327,7 +327,7 @@ export default function App() {
               <button className="social-action-btn" title="Voice"><Mic size={15} strokeWidth={1.75} /></button>
               <button className="social-action-btn" title="Party"><Users size={15} strokeWidth={1.75} /></button>
             </div>
-            <span className="social-version">v0.0.1</span>
+            <span className="social-version">v{__APP_VERSION__}</span>
           </div>
 
         </aside>
