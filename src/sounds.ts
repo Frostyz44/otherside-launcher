@@ -37,7 +37,7 @@ function play(buf: AudioBuffer, volume = 1.0, duration?: number, offset = 0) {
 // Preload all sounds on first import
 const SOUNDS = {
   click:     '/sounds/click.mp3',
-  launch:    '/sounds/launch.mp3',
+  launch:    '/sounds/launch_v2.mp3',
   slide:     '/sounds/slide.mp3',
   hoverPlay: '/sounds/hover-play.mp3',
 };
@@ -84,7 +84,7 @@ export async function sfxNavigate() {
 
 export async function sfxLaunch() {
   const buf = await load(SOUNDS.launch);
-  if (buf) play(buf, 0.6, 1.5);
+  if (buf) play(buf, 0.25, 1.5);
 }
 
 export async function sfxSlide() {
