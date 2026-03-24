@@ -33,7 +33,7 @@ export default function App() {
     if (!saved.bgMusic) return;
     const audio = new Audio('/sounds/background-sound.mp3');
     audio.loop = true;
-    audio.volume = 0.05;
+    audio.volume = 0.25;
     bgMusicRef.current = audio;
     const play = () => { audio.play().catch(() => {}); };
     window.addEventListener('click', play, { once: true });
@@ -218,6 +218,7 @@ export default function App() {
         {/* ── Right social panel ── */}
         <SocialPanel />
       </div>
+
     </div>
   );
 }

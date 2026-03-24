@@ -1,6 +1,6 @@
 {
   "productName": "OSWiki",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "identifier": "xyz.oswiki.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -21,7 +21,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self' tauri: asset: ipc: http://ipc.localhost; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' asset: tauri: data: https: blob:; media-src 'self' asset: tauri: blob: https://cdn.oswiki.xyz; connect-src 'self' ipc: http://ipc.localhost https://api.oswiki.xyz https://pbs.twimg.com https://cdn.oswiki.xyz https://othersidecalendar.apechain.com"
+      "csp": "default-src 'self' tauri: asset: ipc: http://ipc.localhost; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' asset: tauri: data: https: blob:; media-src 'self' asset: tauri: blob: https://cdn.oswiki.xyz; connect-src 'self' ipc: http://ipc.localhost https://api.oswiki.xyz https://pbs.twimg.com https://cdn.oswiki.xyz https://othersidecalendar.apechain.com https://www.otherside.xyz https://*.otherside.xyz"
     }
   },
   "plugins": {
