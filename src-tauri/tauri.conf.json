@@ -1,0 +1,46 @@
+{
+  "productName": "OSWiki",
+  "version": "0.1.0",
+  "identifier": "xyz.oswiki.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "OSWiki Launcher",
+        "width": 1400,
+        "height": 860,
+        "minWidth": 900,
+        "minHeight": 600,
+        "decorations": false,
+        "transparent": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' tauri: asset: ipc: http://ipc.localhost; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' asset: tauri: data: https: blob:; media-src 'self' asset: tauri: blob: https://cdn.oswiki.xyz; connect-src 'self' https://api.oswiki.xyz https://pbs.twimg.com https://cdn.oswiki.xyz"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlCNDIyNkIyNzU3RURGNTIKUldSUzMzNTFzaVpDbTlENnhxOGlSSHdRMkpIRjB5SkQ1TEovazBOcGtnZFlOT2p0clMvL1lXWmkK",
+      "endpoints": [
+        "https://github.com/Frostyz44/otherside-launcher/releases/latest/download/latest.json"
+      ]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+
+# Tauri / Rust
+src-tauri/target/
+src-tauri/gen/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vite
+*.local
