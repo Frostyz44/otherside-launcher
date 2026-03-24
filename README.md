@@ -5,7 +5,6 @@ The official desktop launcher by [OSWiki](https://oswiki.xyz) — your gateway t
 ## Features
 
 - Browse and launch Otherside experiences
-- Live NFT market data and portfolio overview
 - Upcoming Otherside events feed
 - Latest patch notes
 - Auto-updates via built-in updater
