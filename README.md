@@ -1,6 +1,6 @@
 # OSWiki Launcher
 
-The official desktop launcher for [OSWiki](https://oswiki.xyz) — your gateway to the Otherside metaverse.
+The official desktop launcher by [OSWiki](https://oswiki.xyz) — your gateway to the Otherside metaverse.
 
 ## Features
 
