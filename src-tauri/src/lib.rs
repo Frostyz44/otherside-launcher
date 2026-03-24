@@ -6,17 +6,51 @@ use tauri::{
 
 #[tauri::command]
 async fn fetch_upcoming_events() -> Result<serde_json::Value, String> {
-    reqwest::Client::builder()
+    use base64::Engine as _;
+
+    let client = reqwest::Client::builder()
         .use_rustls_tls()
         .build()
-        .map_err(|e| e.to_string())?
+        .map_err(|e| e.to_string())?;
+
+    let mut events: Vec<serde_json::Value> = client
         .get("https://othersidecalendar.apechain.com/api/v1/events/upcoming?limit=10")
         .send()
         .await
         .map_err(|e| e.to_string())?
-        .json::<serde_json::Value>()
+        .json()
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+
+    let image_futures: Vec<_> = events
+        .iter()
+        .map(|e| {
+            let path = e.get("imageUrl").and_then(|v| v.as_str()).unwrap_or("").to_string();
+            let client = client.clone();
+            async move {
+                if path.is_empty() { return None; }
+                let url = format!("https://othersidecalendar.apechain.com{}", path);
+                let resp = client.get(&url).send().await.ok()?;
+                let mime = resp.headers()
+                    .get("content-type")
+                    .and_then(|v| v.to_str().ok())
+                    .and_then(|v| v.split(';').next())
+                    .unwrap_or("image/png")
+                    .to_string();
+                let bytes = resp.bytes().await.ok()?;
+                Some(format!("data:{};base64,{}", mime,
+                    base64::engine::general_purpose::STANDARD.encode(&bytes)))
+            }
+        })
+        .collect();
+
+    for (event, img) in events.iter_mut().zip(futures::future::join_all(image_futures).await) {
+        if let Some(data_url) = img {
+            event["imageUrl"] = serde_json::Value::String(data_url);
+        }
+    }
+
+    Ok(serde_json::Value::Array(events))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

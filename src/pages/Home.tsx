@@ -47,7 +47,9 @@ interface CalendarEvent {
   dateTime: string;
   recurrenceType: string;
   externalUrl: string | null;
+  imageUrl: string | null;
 }
+
 
 function fmtRelative(d: Date): string {
   const diffMs = d.getTime() - Date.now();
@@ -73,6 +75,7 @@ function fmtLocalTime(d: Date): string {
 
 function EventChip({ event, onOpen }: { event: CalendarEvent; onOpen: (url: string) => void }) {
   const d = new Date(event.dateTime);
+  const imgSrc = event.imageUrl ?? null;
   return (
     <Tooltip label={`${d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })} · ${fmtLocalTime(d)} ${TZ_SHORT}`} side="top">
       <div
@@ -80,8 +83,9 @@ function EventChip({ event, onOpen }: { event: CalendarEvent; onOpen: (url: stri
         onClick={() => event.externalUrl && onOpen(event.externalUrl)}
         style={{ cursor: event.externalUrl ? 'pointer' : 'default' }}
       >
-        <span className="ev-relative">{fmtRelative(d)}</span>
+        {imgSrc && <img className="ev-img" src={imgSrc} alt="" />}
         <span className="ev-name">{event.title}</span>
+        <span className="ev-relative">{fmtRelative(d)}</span>
       </div>
     </Tooltip>
   );
