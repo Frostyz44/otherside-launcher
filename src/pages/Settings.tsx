@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import type { Settings } from '../types';
 
-declare const __APP_VERSION__: string;
-
 const SETTINGS_KEY = 'oswiki_settings';
 
 export function loadSettings(): Settings {
