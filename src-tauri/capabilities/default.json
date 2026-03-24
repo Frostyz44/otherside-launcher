@@ -13,6 +13,6 @@
     "opener:default",
     "notification:default",
     "updater:default",
-    "process:allow-relaunch"
+    "process:allow-restart"
   ]
 }

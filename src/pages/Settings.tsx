@@ -61,9 +61,9 @@ export default function Settings({ settings, onChange, bgMusic }: Props) {
       const update = await check();
       if (update?.available) {
         setUpdateStatus('available');
-        const { relaunch } = await import('@tauri-apps/plugin-process');
+        const { restart } = await import('@tauri-apps/plugin-process');
         await update.downloadAndInstall();
-        await relaunch();
+        await restart();
       } else {
         setUpdateStatus('latest');
         setTimeout(() => setUpdateStatus('idle'), 3000);
