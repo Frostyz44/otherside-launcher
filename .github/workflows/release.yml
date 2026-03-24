@@ -50,4 +50,5 @@ jobs:
           releaseBody: 'See release notes below.'
           releaseDraft: false
           prerelease: false
+          updaterJsonPreferNsis: true
           args: ${{ matrix.args }}
