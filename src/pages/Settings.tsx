@@ -68,7 +68,8 @@ export default function Settings({ settings, onChange, bgMusic }: Props) {
         setUpdateStatus('latest');
         setTimeout(() => setUpdateStatus('idle'), 3000);
       }
-    } catch {
+    } catch (e) {
+      console.error('Update check failed:', e);
       setUpdateStatus('idle');
     }
   }
