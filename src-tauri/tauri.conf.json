@@ -1,6 +1,6 @@
 {
   "productName": "OSWiki",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "identifier": "xyz.oswiki.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -26,7 +26,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlCNDIyNkIyNzU3RURGNTIKUldSUzMzNTFzaVpDbTlENnhxOGlSSHdRMkpIRjB5SkQ1TEovazBOcGtnZFlOT2p0clMvL1lXWmkK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEFBQzU4OUVFN0VGRDYzRTIKUldUaVkvMSs3b25GcXVUTURiUHkxZStmRDlNZVordU8raFErSGMzRVhQbnFCY3FpSi8xQWJTRTkK",
       "endpoints": [
         "https://github.com/Frostyz44/otherside-launcher/releases/latest/download/latest.json"
       ]
