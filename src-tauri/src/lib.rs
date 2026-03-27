@@ -69,8 +69,10 @@ pub fn run() {
         })
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                window.hide().unwrap();
-                api.prevent_close();
+                if window.label() == "main" {
+                    window.hide().unwrap();
+                    api.prevent_close();
+                }
             }
         })
         .run(tauri::generate_context!())

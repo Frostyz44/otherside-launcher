@@ -1,6 +1,6 @@
 {
   "productName": "OSWiki",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "identifier": "xyz.oswiki.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -9,6 +9,7 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "title": "OSWiki Launcher",
@@ -21,7 +22,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self' tauri: asset: ipc: http://ipc.localhost; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' asset: tauri: data: https: blob:; media-src 'self' asset: tauri: blob: https://cdn.oswiki.xyz; connect-src 'self' ipc: http://ipc.localhost https://api.oswiki.xyz https://pbs.twimg.com https://cdn.oswiki.xyz https://othersidecalendar.apechain.com https://www.otherside.xyz https://*.otherside.xyz"
+      "csp": "default-src 'self' tauri: asset: ipc: http://ipc.localhost; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' asset: tauri: data: https: blob:; media-src 'self' asset: tauri: blob: https://cdn.oswiki.xyz; frame-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com; child-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org; connect-src 'self' ipc: http://ipc.localhost https://api.oswiki.xyz https://pbs.twimg.com https://cdn.oswiki.xyz https://othersidecalendar.apechain.com https://www.otherside.xyz https://*.otherside.xyz https://auth.privy.io https://*.rpc.privy.systems https://api.useglyph.io wss://relay.walletconnect.com wss://relay.walletconnect.org wss://www.walletlink.org https://explorer-api.walletconnect.com"
     }
   },
   "plugins": {

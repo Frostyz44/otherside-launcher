@@ -1,4 +1,6 @@
 import { useState, type RefObject } from 'react';
+import { useAuth } from '../auth';
+import { LogOut } from 'lucide-react';
 import type { Settings } from '../types';
 
 const SETTINGS_KEY = 'oswiki_settings';
@@ -52,6 +54,7 @@ function Toggle({ label, description, checked, onChange }: {
 }
 
 export default function Settings({ settings, onChange, bgMusic }: Props) {
+  const { logout } = useAuth();
   const [updateStatus, setUpdateStatus] = useState<'idle' | 'checking' | 'latest' | 'available'>('idle');
 
   async function checkForUpdates() {
@@ -123,6 +126,22 @@ export default function Settings({ settings, onChange, bgMusic }: Props) {
                 }
               }}
             />
+          </div>
+        </section>
+
+        <section className="settings-section">
+          <h2 className="section-title">Account</h2>
+          <div className="settings-card">
+            <div className="setting-row">
+              <div className="setting-text">
+                <span className="setting-label">Sign out</span>
+                <span className="setting-desc">Return to the login screen</span>
+              </div>
+              <button className="logout-btn" onClick={logout}>
+                <LogOut size={14} strokeWidth={2} />
+                Sign out
+              </button>
+            </div>
           </div>
         </section>
 

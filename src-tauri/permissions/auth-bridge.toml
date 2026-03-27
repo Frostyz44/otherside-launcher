@@ -1,0 +1,4 @@
+[[permission]]
+identifier = "allow-fetch-upcoming-events"
+description = "Fetch Otherside calendar events for the launcher."
+commands.allow = ["fetch_upcoming_events"]

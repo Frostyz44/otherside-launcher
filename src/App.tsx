@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronRight, Minus, Settings2, X } from 'lucide-react';
+import { useAuth } from './auth';
 import { Tooltip } from './components/Tooltip';
-import SocialPanel from './components/SocialPanel';
 import oswikiLogo from './assets/oswiki_logo.png';
 import Home from './pages/Home';
 import Experiences from './pages/Experiences';
+import LoginScreen from './pages/Login';
 import SettingsPage, { loadSettings, saveSettings } from './pages/Settings';
 import type { NavPage, Settings } from './types';
 import { sfxClick, sfxNavigate, sfxHover, sfxHoverPlay, sfxLaunch, preloadSounds } from './sounds';
@@ -20,7 +21,19 @@ function invoke(cmd: string, args?: Record<string, unknown>) {
   return window.__TAURI_INTERNALS__?.invoke(cmd, args);
 }
 
+function truncateAddress(addr?: string | null): string {
+  if (!addr) return 'Unknown';
+  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+}
+
 export default function App() {
+  const { loggedIn } = useAuth();
+  if (!loggedIn) return <LoginScreen />;
+  return <AuthenticatedApp />;
+}
+
+function AuthenticatedApp() {
+  const { address, name, picture } = useAuth();
   const [page, setPage] = useState<NavPage>('home');
   const [settings, setSettings] = useState<Settings>(loadSettings());
   const [visited, setVisited] = useState<Set<NavPage>>(new Set(['home']));
@@ -33,7 +46,7 @@ export default function App() {
     if (!saved.bgMusic) return;
     const audio = new Audio('/sounds/background-sound.mp3');
     audio.loop = true;
-    audio.volume = 0.25;
+    audio.volume = 0.35;
     bgMusicRef.current = audio;
     const play = () => { audio.play().catch(() => {}); };
     window.addEventListener('click', play, { once: true });
@@ -115,6 +128,9 @@ export default function App() {
     navigate(page === 'settings' ? 'home' : 'settings');
   }
 
+  const displayName = name ?? truncateAddress(address);
+  const avatarLetter = (name ?? address ?? 'U')[0].toUpperCase();
+
   return (
     <div className="app">
       {updateInfo && (
@@ -166,19 +182,18 @@ export default function App() {
         </div>
 
         <div className="topbar-right" data-tauri-drag-region={false}>
-          {/* Profile + window controls — unified right block */}
           <div className="topbar-right-block" data-tauri-drag-region={false}>
             <div className="tp-avatar-wrap">
-              <img
-                src="https://pbs.twimg.com/profile_images/1977408040438542336/XKfN2_rv_400x400.jpg"
-                alt="Frostyz"
-                className="tp-avatar"
-              />
+              {picture ? (
+                <img src={picture} alt={displayName} className="tp-avatar" />
+              ) : (
+                <div className="tp-avatar tp-avatar-fallback">{avatarLetter}</div>
+              )}
               <span className="tp-status-dot" />
             </div>
             <div className="tp-info">
-              <span className="tp-name">Frostyz</span>
-              <span className="tp-level">Level 40</span>
+              <span className="tp-name">{displayName}</span>
+              <span className="tp-level">{truncateAddress(address)}</span>
             </div>
             <div className="wc-buttons">
               <Tooltip label="Minimize" side="bottom">
@@ -203,7 +218,6 @@ export default function App() {
 
       {/* ── Main area ── */}
       <div className="main-area">
-        {/* Content */}
         <div className="content-area">
           {(['home', 'experiences', 'shop', 'settings'] as const).map(id => (
             <div key={id} className={`page-mount${page === id ? ' page-mount-active' : ''}`}>
@@ -214,11 +228,7 @@ export default function App() {
             </div>
           ))}
         </div>
-
-        {/* ── Right social panel ── */}
-        <SocialPanel />
       </div>
-
     </div>
   );
 }

@@ -3,6 +3,7 @@
   "description": "Default capability for OSWiki desktop app",
   "windows": ["main"],
   "permissions": [
+    "allow-fetch-upcoming-events",
     "core:default",
     "core:window:allow-start-dragging",
     "core:window:allow-hide",
@@ -10,6 +11,7 @@
     "core:window:allow-toggle-maximize",
     "core:window:allow-is-visible",
     "core:window:allow-set-focus",
+    "core:window:allow-close",
     "opener:default",
     "notification:default",
     "updater:default",
