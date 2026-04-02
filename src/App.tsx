@@ -64,6 +64,13 @@ export default function App() {
         if (urls[0]) handleDeepLink(urls[0]);
       }).catch(() => {});
     }).catch(() => {});
+
+    // Also listen for URLs forwarded from single-instance callback (more reliable on Windows)
+    import('@tauri-apps/api/event').then(({ listen }) => {
+      listen<string>('deep-link-received', (event) => {
+        handleDeepLink(event.payload);
+      });
+    }).catch(() => {});
   }, [login]);
 
   if (!loggedIn) return <LoginScreen />;

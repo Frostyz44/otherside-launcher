@@ -1,7 +1,7 @@
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    Manager, Runtime,
+    Emitter, Manager, Runtime,
 };
 
 #[tauri::command]
@@ -64,10 +64,16 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_deep_link::init())
-        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.show();
                 let _ = window.set_focus();
+            }
+            // Forward deep link URLs to frontend
+            for arg in &argv {
+                if arg.starts_with("oswiki://") {
+                    let _ = app.emit("deep-link-received", arg.clone());
+                }
             }
         }))
         .setup(|app| {
