@@ -260,15 +260,22 @@
   margin-right: 28px;
 }
 .patch-modal-list {
-  list-style: none; padding: 0; margin: 0;
-  overflow-y: auto; display: flex; flex-direction: column; gap: 0;
+  overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
   max-height: calc(70vh - 110px);
 }
-.patch-modal-list li {
-  font-size: 12px; color: rgba(240,230,211,0.65); line-height: 1.4;
-  padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+.patch-modal-section { display: flex; flex-direction: column; gap: 4px; }
+.patch-modal-section-heading {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent); opacity: 0.8;
 }
-.patch-modal-list li:last-child { border-bottom: none; }
+.patch-modal-section-list {
+  list-style: none; padding: 0; margin: 0;
+}
+.patch-modal-section-list li {
+  font-size: 12px; color: rgba(240,230,211,0.65); line-height: 1.4;
+  padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.patch-modal-section-list li:last-child { border-bottom: none; }
 .patch-modal-link {
   background: none; border: none; padding: 0;
   font-size: 11px; color: rgba(200,155,60,0.6); cursor: pointer;

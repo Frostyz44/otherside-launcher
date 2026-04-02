@@ -29,6 +29,7 @@ const FEATURED_SLUGS = ['otherside', 'nexus', 'bathroom-blitz', 'vibe-maker', 't
 const FALLBACK_PATCH: PatchNote = {
   version: '2026.04.01',
   bullets: ['Level cap increased from 40 to 60', 'New Swamp Daily Tasks', '5 New Badges Added', '3 New Challenges Added'],
+  sections: [],
 };
 
 interface CalendarEvent {
@@ -269,9 +270,23 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
               <span className="patch-modal-ver">{latestPatch.version}</span>
               <button className="trailer-modal-close" onClick={() => setShowPatchModal(false)}>✕</button>
             </div>
-            <ul className="patch-modal-list">
-              {latestPatch.bullets.map((b, i) => <li key={i}>{b}</li>)}
-            </ul>
+            <div className="patch-modal-list">
+              {latestPatch.sections.length > 0
+                ? latestPatch.sections.map((section, si) => (
+                  <div key={si} className="patch-modal-section">
+                    {section.heading && <div className="patch-modal-section-heading">{section.heading}</div>}
+                    <ul className="patch-modal-section-list">
+                      {section.bullets.map((b, bi) => <li key={bi}>{b}</li>)}
+                    </ul>
+                  </div>
+                ))
+                : latestPatch.bullets.map((b, i) => (
+                  <div key={i} className="patch-modal-section">
+                    <ul className="patch-modal-section-list"><li>{b}</li></ul>
+                  </div>
+                ))
+              }
+            </div>
             <button className="patch-modal-link" onClick={() => { openUrl(PATCH_URL); }}>
               View full notes on docs.otherside.xyz ↗
             </button>

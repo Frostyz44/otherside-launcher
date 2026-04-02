@@ -80,9 +80,15 @@ export async function fetchTrending(): Promise<TrendingCollection[]> {
   return json.data ?? [];
 }
 
+export interface PatchSection {
+  heading: string;
+  bullets: string[];
+}
+
 export interface PatchNote {
   version: string;
   bullets: string[];
+  sections: PatchSection[];
 }
 
 export async function fetchPatchNotes(): Promise<PatchNote[]> {
