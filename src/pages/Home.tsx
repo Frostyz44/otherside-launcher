@@ -160,15 +160,17 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
     fetchExperiences({ sortBy: 'sort_order', sortDirection: 'asc' })
       .then(res => setExperiences(res.data))
       .catch(() => {});
-    fetchPatchNotes().then(patches => {
-      if (patches[0]) setLatestPatch(patches[0]);
-    });
+    const loadPatchNotes = () =>
+      fetchPatchNotes().then(patches => {
+        if (patches[0]) setLatestPatch(patches[0]);
+      }).catch(() => {});
+    loadPatchNotes();
     const loadEvents = () =>
       invoke<CalendarEvent[]>('fetch_upcoming_events')
         .then(data => setEvents(data))
         .catch(err => console.error('fetch_upcoming_events:', err));
     loadEvents();
-    const timer = setInterval(loadEvents, 5 * 60 * 1000);
+    const timer = setInterval(() => { loadEvents(); loadPatchNotes(); }, 5 * 60 * 1000);
     return () => clearInterval(timer);
   }, []);
 
