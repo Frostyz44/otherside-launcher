@@ -1,6 +1,6 @@
 {
   "productName": "OSWiki",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "identifier": "xyz.oswiki.app",
   "build": {
     "beforeDevCommand": "npm run dev",
