@@ -144,6 +144,7 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
   const [experiences, setExperiences] = useState<ExperienceData[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [latestPatch, setLatestPatch] = useState<PatchNote>(FALLBACK_PATCH);
+  const [showPatchModal, setShowPatchModal] = useState(false);
   const nextEvent = events[0] ?? null;
   const [idx, setIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(0);
@@ -259,6 +260,25 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
   return (
     <div className="home-fullscreen">
 
+      {/* Patch notes modal */}
+      {showPatchModal && (
+        <div className="trailer-modal-overlay" onClick={() => setShowPatchModal(false)}>
+          <div className="patch-modal-box" onClick={e => e.stopPropagation()}>
+            <div className="patch-modal-header">
+              <span className="patch-modal-title">Patch Notes</span>
+              <span className="patch-modal-ver">{latestPatch.version}</span>
+              <button className="trailer-modal-close" onClick={() => setShowPatchModal(false)}>✕</button>
+            </div>
+            <ul className="patch-modal-list">
+              {latestPatch.bullets.map((b, i) => <li key={i}>{b}</li>)}
+            </ul>
+            <button className="patch-modal-link" onClick={() => { openUrl(PATCH_URL); }}>
+              View full notes on docs.otherside.xyz ↗
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Trailer modal */}
       {trailerOpen && (
         <div className="trailer-modal-overlay" onClick={() => setTrailerOpen(false)}>
@@ -370,7 +390,7 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
           )}
           <div className="hero-patches-group">
             <span className="info-card-label">Patch Notes</span>
-            <div className="patch-card" onClick={() => openLink(PATCH_URL)}>
+            <div className="patch-card" onClick={() => setShowPatchModal(true)}>
               <ul className="patch-card-list">
                 {latestPatch.bullets.slice(0, 3).map((b, i) => <li key={i}>{b}</li>)}
               </ul>

@@ -238,6 +238,44 @@
 }
 .trailer-modal-close:hover { background: rgba(200,155,60,0.3); border-color: var(--accent); }
 
+/* ── Patch notes modal ── */
+.patch-modal-box {
+  position: relative; width: 480px; max-height: 70vh;
+  background: rgba(1,10,19,0.97); border: 1px solid rgba(200,155,60,0.25);
+  border-radius: 8px; padding: 20px 24px 16px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+  animation: modal-in 0.2s ease;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.patch-modal-header {
+  display: flex; align-items: center; gap: 8px;
+}
+.patch-modal-title {
+  font-size: 13px; font-weight: 700; color: rgba(240,230,211,0.9);
+  letter-spacing: 0.05em; text-transform: uppercase; flex: 1;
+}
+.patch-modal-ver {
+  font-size: 11px; font-weight: 600; color: var(--accent);
+  font-family: 'Barlow', monospace; letter-spacing: 0.06em;
+  margin-right: 28px;
+}
+.patch-modal-list {
+  list-style: none; padding: 0; margin: 0;
+  overflow-y: auto; display: flex; flex-direction: column; gap: 0;
+  max-height: calc(70vh - 110px);
+}
+.patch-modal-list li {
+  font-size: 12px; color: rgba(240,230,211,0.65); line-height: 1.4;
+  padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.patch-modal-list li:last-child { border-bottom: none; }
+.patch-modal-link {
+  background: none; border: none; padding: 0;
+  font-size: 11px; color: rgba(200,155,60,0.6); cursor: pointer;
+  text-align: left; transition: color 0.15s;
+}
+.patch-modal-link:hover { color: var(--accent); }
+
 /* ── Info / patch cards ── */
 .hero-info-panel {
   position: absolute; bottom: 80px; right: 20px; z-index: 3;
