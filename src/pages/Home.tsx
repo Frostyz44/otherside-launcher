@@ -170,8 +170,9 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
         .then(data => setEvents(data))
         .catch(err => console.error('fetch_upcoming_events:', err));
     loadEvents();
-    const timer = setInterval(() => { loadEvents(); loadPatchNotes(); }, 5 * 60 * 1000);
-    return () => clearInterval(timer);
+    const timer = setInterval(loadEvents, 5 * 60 * 1000);
+    const patchTimer = setInterval(loadPatchNotes, 2 * 60 * 60 * 1000);
+    return () => { clearInterval(timer); clearInterval(patchTimer); };
   }, []);
 
   // Build featured list: defined slugs first (in order), then all remaining active experiences
