@@ -59,7 +59,12 @@ export async function fetchExperiences(filters?: ExperienceFilters): Promise<Exp
 
 export async function fetchProfile(address: string): Promise<{ username: string | null; picture: string | null } | null> {
   try {
-    const res = await apiFetch(`${API_BASE}/account/${address}`);
+    // Use plain fetch (not apiFetch) so a 401 here never triggers session expiration —
+    // profile sync is non-critical; the user is already logged in.
+    const token = getToken();
+    const res = await fetch(`${API_BASE}/account/${address}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
     if (!res.ok) return null;
     const json = await res.json();
     return { username: json.username ?? null, picture: json.picture ?? null };
