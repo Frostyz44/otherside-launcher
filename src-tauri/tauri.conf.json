@@ -1,6 +1,6 @@
 {
   "productName": "OSWiki",
-  "version": "0.3.7",
+  "version": "0.4.0",
   "identifier": "xyz.oswiki.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -26,6 +26,11 @@
     }
   },
   "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["oswiki"]
+      }
+    },
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEFBQzU4OUVFN0VGRDYzRTIKUldUaVkvMSs3b25GcXVUTURiUHkxZStmRDlNZVordU8raFErSGMzRVhQbnFCY3FpSi8xQWJTRTkK",
       "endpoints": [

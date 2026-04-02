@@ -9,7 +9,22 @@ import LoginScreen from './pages/Login';
 import SettingsPage, { loadSettings, saveSettings } from './pages/Settings';
 import type { NavPage, Settings } from './types';
 import { sfxClick, sfxNavigate, sfxHover, sfxHoverPlay, sfxLaunch, preloadSounds } from './sounds';
+import { fetchProfile } from './api';
 import './App.css';
+
+function parseDeepLink(url: string): { token: string; address: string; name?: string; picture?: string } | null {
+  try {
+    // Handle both oswiki://auth?... and oswiki:auth?... (Windows may strip slashes)
+    const queryString = url.includes('?') ? url.split('?')[1] : '';
+    const params = new URLSearchParams(queryString);
+    const token = params.get('token');
+    const address = params.get('address');
+    if (!token || !address) return null;
+    return { token, address, name: params.get('name') ?? undefined, picture: params.get('picture') ?? undefined };
+  } catch {
+    return null;
+  }
+}
 
 const NAV: { id: NavPage; label: string }[] = [
   { id: 'home', label: 'Home' },
@@ -27,19 +42,53 @@ function truncateAddress(addr?: string | null): string {
 }
 
 export default function App() {
-  const { loggedIn } = useAuth();
+  const { loggedIn, login } = useAuth();
+
+  // Listen for deep link auth callbacks
+  useEffect(() => {
+    function handleDeepLink(url: string) {
+      const data = parseDeepLink(url);
+      if (data) {
+        login({ token: data.token, address: data.address, name: data.name, picture: data.picture });
+      }
+    }
+
+    // Check if app was launched via deep link
+    import('@tauri-apps/plugin-deep-link').then(({ getCurrent, onOpenUrl }) => {
+      getCurrent().then(urls => {
+        if (urls?.[0]) handleDeepLink(urls[0]);
+      }).catch(() => {});
+
+      // Listen for deep links while running (requires single-instance plugin)
+      onOpenUrl(urls => {
+        if (urls[0]) handleDeepLink(urls[0]);
+      }).catch(() => {});
+    }).catch(() => {});
+  }, [login]);
+
   if (!loggedIn) return <LoginScreen />;
   return <AuthenticatedApp />;
 }
 
 function AuthenticatedApp() {
-  const { address, name, picture } = useAuth();
+  const { address, name, picture, login, token } = useAuth();
   const [page, setPage] = useState<NavPage>('home');
   const [settings, setSettings] = useState<Settings>(loadSettings());
   const [visited, setVisited] = useState<Set<NavPage>>(new Set(['home']));
   const [updateInfo, setUpdateInfo] = useState<{ version: string; install: () => Promise<void> } | null>(null);
   const [updating, setUpdating] = useState(false);
   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
+
+  // Sync profile from backend on mount (picks up username/picture changes)
+  useEffect(() => {
+    if (!address) return;
+    fetchProfile(address).then(profile => {
+      if (!profile) return;
+      if (profile.username !== name || profile.picture !== picture) {
+        login({ address, token, name: profile.username, picture: profile.picture });
+      }
+    });
+  }, []);
 
   useEffect(() => {
     const saved = loadSettings();

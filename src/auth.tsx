@@ -7,6 +7,7 @@ interface AuthState {
   address: string | null;
   name: string | null;
   picture: string | null;
+  token: string | null;
 }
 
 interface AuthContextValue extends AuthState {
@@ -16,9 +17,9 @@ interface AuthContextValue extends AuthState {
 
 function loadAuth(): AuthState {
   try {
-    return { loggedIn: false, address: null, name: null, picture: null, ...JSON.parse(localStorage.getItem(AUTH_KEY) ?? '{}') };
+    return { loggedIn: false, address: null, name: null, picture: null, token: null, ...JSON.parse(localStorage.getItem(AUTH_KEY) ?? '{}') };
   } catch {
-    return { loggedIn: false, address: null, name: null, picture: null };
+    return { loggedIn: false, address: null, name: null, picture: null, token: null };
   }
 }
 
@@ -28,14 +29,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(loadAuth);
 
   const login = useCallback((extra: Partial<Omit<AuthState, 'loggedIn'>> = {}) => {
-    const next: AuthState = { loggedIn: true, address: null, name: null, picture: null, ...extra };
+    const next: AuthState = { loggedIn: true, address: null, name: null, picture: null, token: null, ...extra };
     localStorage.setItem(AUTH_KEY, JSON.stringify(next));
     setState(next);
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem(AUTH_KEY);
-    setState({ loggedIn: false, address: null, name: null, picture: null });
+    setState({ loggedIn: false, address: null, name: null, picture: null, token: null });
   }, []);
 
   return <AuthContext.Provider value={{ ...state, login, logout }}>{children}</AuthContext.Provider>;
