@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, type RefObject } from 'react';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { invoke } from '@tauri-apps/api/core';
 import { Tooltip } from '../components/Tooltip';
-import { fetchExperiences } from '../api';
+import { fetchExperiences, fetchPatchNotes, type PatchNote } from '../api';
 import type { ExperienceData } from '../types';
 import { sfxLaunch, sfxSlide, sfxClick } from '../sounds';
 
@@ -26,20 +26,10 @@ const PATCH_URL = 'https://docs.otherside.xyz/documentation/continuous-developme
 // Featured order — slugs matched against API data, fallback used if slug not found
 const FEATURED_SLUGS = ['otherside', 'nexus', 'bathroom-blitz', 'vibe-maker', 'the-swamp', 'flingers'];
 
-const PATCHES = [
-  {
-    id: 1, version: '2026.03.19',
-    bullets: ['Mega Koda room open to all Kodas & Mega Kodas', 'Chaos Particle minigame + daily tasks', 'New Koda Cam badges', 'Challenge leaderboard reset'],
-  },
-  {
-    id: 2, version: '2026.02.05',
-    bullets: ['New multiplayer & single-player challenges', 'Player HUD keybind hints', '10 new daily tasks · 7 new badges', 'Player position coords on Map overlay'],
-  },
-  {
-    id: 3, version: '2025.12.11',
-    bullets: ['KodaCam introduced', '3 new single-player challenges', 'Map function (bind: Tab)', 'Replay "A Spark Reborn" any time'],
-  },
-];
+const FALLBACK_PATCH: PatchNote = {
+  version: '2026.04.01',
+  bullets: ['Level cap increased from 40 to 60', 'New Swamp Daily Tasks', '5 New Badges Added', '3 New Challenges Added'],
+};
 
 interface CalendarEvent {
   id: string;
@@ -153,6 +143,7 @@ function ParticleBackground() {
 export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement | null> }) {
   const [experiences, setExperiences] = useState<ExperienceData[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [latestPatch, setLatestPatch] = useState<PatchNote>(FALLBACK_PATCH);
   const nextEvent = events[0] ?? null;
   const [idx, setIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(0);
@@ -169,6 +160,9 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
     fetchExperiences({ sortBy: 'sort_order', sortDirection: 'asc' })
       .then(res => setExperiences(res.data))
       .catch(() => {});
+    fetchPatchNotes().then(patches => {
+      if (patches[0]) setLatestPatch(patches[0]);
+    });
     const loadEvents = () =>
       invoke<CalendarEvent[]>('fetch_upcoming_events')
         .then(data => setEvents(data))
@@ -371,17 +365,15 @@ export default function Home({ bgMusic }: { bgMusic?: RefObject<HTMLAudioElement
               </div>
             </div>
           )}
-          {PATCHES[0] && (
-            <div className="hero-patches-group">
-              <span className="info-card-label">Patch Notes</span>
-              <div className="patch-card" onClick={() => openLink(PATCH_URL)}>
-                  <ul className="patch-card-list">
-                    {PATCHES[0].bullets.slice(0, 3).map((b, i) => <li key={i}>{b}</li>)}
-                  </ul>
-                  <div className="patch-card-ver">{PATCHES[0].version}</div>
-                </div>
+          <div className="hero-patches-group">
+            <span className="info-card-label">Patch Notes</span>
+            <div className="patch-card" onClick={() => openLink(PATCH_URL)}>
+              <ul className="patch-card-list">
+                {latestPatch.bullets.slice(0, 3).map((b, i) => <li key={i}>{b}</li>)}
+              </ul>
+              <div className="patch-card-ver">{latestPatch.version}</div>
             </div>
-          )}
+          </div>
         </div>
 
         {featured.length > 1 && (

@@ -79,3 +79,18 @@ export async function fetchTrending(): Promise<TrendingCollection[]> {
   const json = await res.json();
   return json.data ?? [];
 }
+
+export interface PatchNote {
+  version: string;
+  bullets: string[];
+}
+
+export async function fetchPatchNotes(): Promise<PatchNote[]> {
+  try {
+    const res = await fetch(`${API_BASE}/otherside/patch-notes`);
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
